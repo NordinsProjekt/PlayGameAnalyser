@@ -2,9 +2,9 @@
 using PlayGameAnalyser.Interfaces;
 using System.Drawing;
 using System.Drawing.Imaging;
-using PlayGameAnalyser.Service;
+using PlayGameAnalyser.Service.Extensions;
 
-namespace PlayGameAnalyser
+namespace PlayGameAnalyser.Service
 {
     /// <summary>
     /// Service only works on Windows
@@ -94,8 +94,7 @@ namespace PlayGameAnalyser
 
                     // Save the bitmap for further manipulation
                     MemoryStream ms = new MemoryStream();
-                    DXBallAutoPlayer dXBallAutoPlayer = new DXBallAutoPlayer();
-                    return dXBallAutoPlayer.GenerateBitmapDataArray(screenshot);
+                    return screenshot.GenerateBitmapDataArray();
                 }
             }
             catch (Exception)

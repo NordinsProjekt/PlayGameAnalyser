@@ -1,9 +1,7 @@
+using PlayGameAnalyser.Handlers;
 using PlayGameAnalyser.Interfaces;
-using PlayGameAnalyser.Records;
 using PlayGameAnalyser.Service;
-using System;
-using System.Drawing.Imaging;
-using System.Runtime.InteropServices;
+using PlayGameAnalyser.Service.Extensions;
 
 namespace PlayGameAnalyser
 {
@@ -14,10 +12,10 @@ namespace PlayGameAnalyser
         public Form1()
         {
             InitializeComponent();
-
+            IScreenshotService screenshotService = new ScreenshotService();
             Bitmap refPicture = new Bitmap($"381.png");
-            _service = new DXBallAutoPlayer();
-            safePic = _service.GenerateBitmapDataArray(refPicture);
+            safePic = refPicture.GenerateBitmapDataArray();
+            _service = new DXBallAutoPlayer(screenshotService, safePic);
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -31,7 +29,6 @@ namespace PlayGameAnalyser
             label1.Invalidate();
             label1.Update();
             IScreenshotService service = new ScreenshotService();
-            int num = 0;
             Thread.Sleep(7000);
             label1.Text = "START!!!";
             label1.Invalidate();
@@ -40,8 +37,7 @@ namespace PlayGameAnalyser
             while (true)
             {
                 Thread.Sleep(20);
-                var gameScreen = service.GetBitmapDataAsByteArray(new Records.CaptureArea(0, 1050, 330, 2560));
-                var result = SomethingOnScreen(gameScreen);
+                var result = _service.AnalyseGameScreen();
                 if (result > 0)
                 {
                     MouseHandler.SetCursorPosition(result, 100);
@@ -54,30 +50,6 @@ namespace PlayGameAnalyser
             label1.Text = "YOU LOST";
         }
 
-        private int SomethingOnScreen(byte[] bitmap)
-        {
-            if (_service.CheckForGameOverScreen(bitmap[(8 * 4)], bitmap[(8 * 4)+1], bitmap[(8 * 4) + 2]))
-                return -1;
-
-            Dictionary<int, Pixel> mapping = new Dictionary<int, Pixel>();
-            int sum = 0;
-            for (int i = 3; i < bitmap.Length; i += 4)
-            {
-                if (bitmap[i-1] == safePic[i-1])
-                    continue;
-                //Add the pixel that doesnt match the reference
-                mapping.Add(i / 4, new(bitmap[i], bitmap[i - 3], bitmap[i - 2], bitmap[i - 1]));
-                 sum = i / 4;
-            }
-            if (sum == 0)
-                return 0;
-            Pixel match = new(255,66,66,66);
-            sum = mapping.FirstOrDefault(x => x.Value == match).Key;
-
-            while (sum >= 2560)
-                sum -= 2560;
-            return (int)sum;
-        }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
         {

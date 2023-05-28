@@ -5,9 +5,9 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using static PlayGameAnalyser.MouseHandler;
+using static PlayGameAnalyser.Handlers.MouseHandler;
 
-namespace PlayGameAnalyser
+namespace PlayGameAnalyser.Handlers
 {
     //TODO
     //Make function that handle to KeyDown and KeyUp for advanced keystrokes.
@@ -193,7 +193,7 @@ namespace PlayGameAnalyser
         public uint mouseData;
         public MouseEventFlags dwFlags;
         public uint time;
-        public IntPtr dwExtraInfo;
+        public nint dwExtraInfo;
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -203,7 +203,7 @@ namespace PlayGameAnalyser
         public ushort wScan;
         public uint dwFlags;
         public uint time;
-        public IntPtr dwExtraInfo;
+        public nint dwExtraInfo;
     }
 
     [StructLayout(LayoutKind.Sequential)]
@@ -233,7 +233,7 @@ namespace PlayGameAnalyser
         public SendInputEventType type;
         public MOUSEANDKEYBOARDINPUT mkhi;
     }
-    
+
     public class KeyBoardHandler
     {
         public static void KeyPress(KeyCode keyCode)
@@ -249,7 +249,7 @@ namespace PlayGameAnalyser
                         wScan = 0,
                         dwFlags = 0, // if nothing, key down
                         time = 0,
-                        dwExtraInfo = IntPtr.Zero,
+                        dwExtraInfo = nint.Zero,
                     }
                 }
             };
@@ -265,7 +265,7 @@ namespace PlayGameAnalyser
                         wScan = 0,
                         dwFlags = 2, // key up
                         time = 0,
-                        dwExtraInfo = IntPtr.Zero,
+                        dwExtraInfo = nint.Zero,
                     }
                 }
             };
