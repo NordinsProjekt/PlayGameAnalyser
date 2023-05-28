@@ -30,6 +30,7 @@
         {
             button1 = new Button();
             label1 = new Label();
+            comboBox1 = new ComboBox();
             SuspendLayout();
             // 
             // button1
@@ -51,11 +52,22 @@
             label1.TabIndex = 1;
             label1.Text = "label1";
             // 
+            // comboBox1
+            // 
+            comboBox1.FormattingEnabled = true;
+            comboBox1.Items.AddRange(new object[] { "DX Ball 2" });
+            comboBox1.Location = new Point(79, 91);
+            comboBox1.Name = "comboBox1";
+            comboBox1.Size = new Size(172, 23);
+            comboBox1.TabIndex = 2;
+            comboBox1.SelectedIndexChanged += comboBox1_SelectedIndexChanged;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(comboBox1);
             Controls.Add(label1);
             Controls.Add(button1);
             Name = "Form1";
@@ -68,5 +80,6 @@
 
         private Button button1;
         private Label label1;
+        private ComboBox comboBox1;
     }
 }

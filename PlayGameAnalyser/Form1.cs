@@ -21,12 +21,21 @@ namespace PlayGameAnalyser
 
         private void button1_Click(object sender, EventArgs e)
         {
+            if (comboBox1.SelectedIndex == -1)
+            {
+                label1.Text = "You need to select a game!";
+                return;
+            }
             label1.Text = "Waiting......";
+            label1.Invalidate();
+            label1.Update();
             IScreenshotService service = new ScreenshotService();
             int num = 0;
             Thread.Sleep(7000);
             label1.Text = "START!!!";
-            MouseHandler.LeftMouseClick(new Point(0,0));
+            label1.Invalidate();
+            label1.Update();
+            MouseHandler.LeftMouseClick(new Point(0, 0));
             while (true)
             {
                 Thread.Sleep(20);
@@ -44,55 +53,27 @@ namespace PlayGameAnalyser
             label1.Text = "YOU LOST";
         }
 
-        //private int GetBallPos(string screen)
-        //{
-        //    Bitmap bmpReturn = null;
-
-        //    byte[] byteBuffer = Convert.FromBase64String(screen);
-        //    MemoryStream memoryStream = new MemoryStream(byteBuffer);
-
-        //    memoryStream.Position = 0;
-
-        //    bmpReturn = (Bitmap)Image.FromStream(memoryStream);
-        //    var result = SomethingOnScreen(bmpReturn);
-
-        //    return result;
-        //}
-
         private int SomethingOnScreen(byte[] bitmap)
         {
-            //byte[] regValues1 = _service.GenerateBitmapDataArray(bitmap);
-            //bitmapdata bmp1 = bitmap.lockbits(new rectangle(0, 0, 2560, 330), imagelockmode.readonly, bitmap.pixelformat);
-            //intptr ptr = bmp1.scan0;
-
-            //int bytes1 = math.abs(bmp1.stride) * bmp1.height;
-
-            //byte[] regvalues1 = new byte[bytes1];
-            //marshal.copy(ptr, regvalues1, 0, bytes1);
-            int row = 0;
-            for (int i = 2; i < bitmap.Length; i += 4)
+            if (_service.CheckForGameOverScreen(bitmap[(8 * 4)], bitmap[(8 * 4)+1], bitmap[(8 * 4) + 2]))
+                return -1;
+            for (int i = 2; i < bitmap.Length; i += 8)
             {
-                if (bitmap[i] != safePic[i])
-                {
-                    if (bitmap[i] == 0 && bitmap[i - 1] == 0 && bitmap[i - 2] == 0)
-                    {
-                        row++;
-                        continue;
-                    }
-                    else
-                    {
-                        if (row > 100)
-                            return -1;
-                    }
-                    int sum = i / 4;
-                    while (sum >= 2560)
-                    {
-                        sum -= 2560;
-                    }
-                    return (int)sum;
-                }
+                if (bitmap[i] == safePic[i])
+                    continue;
+
+                int sum = i / 4;
+                while (sum >= 2560)
+                    sum -= 2560;
+
+                return (int)sum;
             }
             return 0;
+        }
+
+        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

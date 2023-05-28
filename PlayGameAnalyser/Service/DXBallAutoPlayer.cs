@@ -22,5 +22,12 @@ namespace PlayGameAnalyser.Service
             Marshal.Copy(ptr2, safePic, 0, bytes2);
             return safePic;
         }
+
+        internal bool CheckForGameOverScreen(byte r, byte g, byte b)
+        {
+            if (r == 0 && g == 0 && b == 0)
+                return true;
+            return false;
+        }
     }
 }
