@@ -1,4 +1,5 @@
 using PlayGameAnalyser.Interfaces;
+using PlayGameAnalyser.Records;
 using PlayGameAnalyser.Service;
 using System;
 using System.Drawing.Imaging;
@@ -57,18 +58,25 @@ namespace PlayGameAnalyser
         {
             if (_service.CheckForGameOverScreen(bitmap[(8 * 4)], bitmap[(8 * 4)+1], bitmap[(8 * 4) + 2]))
                 return -1;
-            for (int i = 2; i < bitmap.Length; i += 8)
+
+            Dictionary<int, Pixel> mapping = new Dictionary<int, Pixel>();
+            int sum = 0;
+            for (int i = 3; i < bitmap.Length; i += 4)
             {
-                if (bitmap[i] == safePic[i])
+                if (bitmap[i-1] == safePic[i-1])
                     continue;
-
-                int sum = i / 4;
-                while (sum >= 2560)
-                    sum -= 2560;
-
-                return (int)sum;
+                //Add the pixel that doesnt match the reference
+                mapping.Add(i / 4, new(bitmap[i], bitmap[i - 3], bitmap[i - 2], bitmap[i - 1]));
+                 sum = i / 4;
             }
-            return 0;
+            if (sum == 0)
+                return 0;
+            Pixel match = new(255,66,66,66);
+            sum = mapping.FirstOrDefault(x => x.Value == match).Key;
+
+            while (sum >= 2560)
+                sum -= 2560;
+            return (int)sum;
         }
 
         private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)

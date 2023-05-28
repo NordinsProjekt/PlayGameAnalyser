@@ -96,10 +96,6 @@ namespace PlayGameAnalyser
                     MemoryStream ms = new MemoryStream();
                     DXBallAutoPlayer dXBallAutoPlayer = new DXBallAutoPlayer();
                     return dXBallAutoPlayer.GenerateBitmapDataArray(screenshot);
-                    //screenshot.Save(ms, ImageFormat.Png);
-                    //byte[] byteImage = ms.ToArray();
-                    //var SigBase64 = Convert.ToBase64String(byteImage); // Get Base64
-                    //return SigBase64;
                 }
             }
             catch (Exception)
