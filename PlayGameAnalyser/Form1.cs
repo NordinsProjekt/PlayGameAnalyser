@@ -1,5 +1,6 @@
 using PlayGameAnalyser.Handlers;
 using PlayGameAnalyser.Interfaces;
+using PlayGameAnalyser.Records;
 using PlayGameAnalyser.Service;
 using PlayGameAnalyser.Service.Extensions;
 
@@ -9,13 +10,14 @@ namespace PlayGameAnalyser
     {
         private byte[] safePic { get; init; }
         private readonly DXBallAutoPlayer _service;
+        IScreenshotService screenshotService = new ScreenshotService();
         public Form1()
         {
             InitializeComponent();
-            IScreenshotService screenshotService = new ScreenshotService();
+            
             Bitmap refPicture = new Bitmap($"381.png");
             safePic = refPicture.GenerateBitmapDataArray();
-            _service = new DXBallAutoPlayer(screenshotService, safePic);
+            _service = new DXBallAutoPlayer(safePic);
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -37,7 +39,8 @@ namespace PlayGameAnalyser
             while (true)
             {
                 Thread.Sleep(20);
-                var result = _service.AnalyseGameScreen();
+                var screen = screenshotService.GetBitmapDataAsByteArray(new CaptureArea(0, 1050, 330, 2560));
+                var result = _service.AnalyseGameScreen(screen);
                 if (result > 0)
                 {
                     MouseHandler.SetCursorPosition(result, 100);

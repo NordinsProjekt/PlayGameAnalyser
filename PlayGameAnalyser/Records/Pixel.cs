@@ -6,5 +6,5 @@ using System.Threading.Tasks;
 
 namespace PlayGameAnalyser.Records
 {
-    internal sealed record Pixel(byte Alpha,byte Red, byte Blue, byte Green);
+    internal sealed record Pixel(byte Alpha, byte Blue, byte Green, byte Red);
 }
