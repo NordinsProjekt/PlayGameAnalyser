@@ -43,7 +43,7 @@ namespace PlayGameAnalyser
                 var screen = screenshotService.GetBitmapDataAsByteArray(new CaptureArea(0, 1050, 330, 2560));
                 var result = _service.AnalyseGameScreen(screen);
 
-                if (result.X > 0) //Move Paddle
+                if (result.X > 0) //Move Paddle and shoot if laser guns is on the paddle
                 {
                     if (result.paddleGuns)
                         MouseHandler.LeftMouseClick(new Point(result.X, 50));

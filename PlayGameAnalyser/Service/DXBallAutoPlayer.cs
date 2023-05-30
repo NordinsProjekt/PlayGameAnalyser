@@ -75,6 +75,8 @@ namespace PlayGameAnalyser.Service
                 return new(-2, false);
 
             //TODO Need pixel for the different colored balls
+            //Fireball
+            Pixel fireball = new(255, 49, 165, 255);
             //Ball
             Pixel ball = new(255, 66, 66, 66);
             //Powerup
@@ -87,10 +89,14 @@ namespace PlayGameAnalyser.Service
             int ballLocation = mapping.FirstOrDefault(x => x.Key.Equals(ball)).Value;
             int powerLocation = mapping.FirstOrDefault(x => x.Key.Equals(powerup)).Value;
             int paddleGun = mapping.FirstOrDefault(x => x.Key.Equals(paddleGuns)).Value;
+            int fireballLocation = mapping.FirstOrDefault(x => x.Key.Equals(fireball)).Value;
             bool guns = paddleGun > 0;
 
             if (powerLocation > ballLocation)
                 ballLocation = powerLocation;
+
+            if (powerLocation < fireballLocation)
+                ballLocation = fireballLocation;
 
             return new(CalculateXPosition(ballLocation), guns);
         }
