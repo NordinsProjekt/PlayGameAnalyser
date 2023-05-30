@@ -3,6 +3,7 @@ using PlayGameAnalyser.Interfaces;
 using PlayGameAnalyser.Records;
 using PlayGameAnalyser.Service;
 using PlayGameAnalyser.Service.Extensions;
+using System.Drawing;
 
 namespace PlayGameAnalyser
 {
@@ -35,19 +36,29 @@ namespace PlayGameAnalyser
             label1.Text = "START!!!";
             label1.Invalidate();
             label1.Update();
-            MouseHandler.LeftMouseClick(new Point(0, 0));
+            int lastPos = 0;
             while (true)
             {
                 Thread.Sleep(20);
                 var screen = screenshotService.GetBitmapDataAsByteArray(new CaptureArea(0, 1050, 330, 2560));
                 var result = _service.AnalyseGameScreen(screen);
-                if (result > 0)
+
+                if (result.X > 0) //Move Paddle
                 {
-                    MouseHandler.SetCursorPosition(result, 100);
+                    if (result.paddleGuns)
+                        MouseHandler.LeftMouseClick(new Point(result.X, 50));
+                    if (lastPos > result.X) MouseHandler.SetCursorPosition(result.X +25, 100);
+                    if (lastPos < result.X ) MouseHandler.SetCursorPosition(result.X - 25, 100);
+                    lastPos = result.X;
                 }
-                if (result == -1)
+                if (result.X == -1) //Game Over
                 {
                     break;
+                }
+
+                if(result.X == -2) //Ball is magneticlocked on paddle
+                {
+                    MouseHandler.LeftMouseClick(new Point(lastPos, 50));
                 }
             }
             label1.Text = "YOU LOST";

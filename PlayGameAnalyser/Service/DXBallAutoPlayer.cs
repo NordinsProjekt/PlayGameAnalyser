@@ -2,6 +2,7 @@
 using PlayGameAnalyser.Records;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -25,24 +26,39 @@ namespace PlayGameAnalyser.Service
             return false;
         }
 
-        internal int AnalyseGameScreen(byte[] gameScreen)
+        internal ScreenAnalyseResult AnalyseGameScreen(byte[] gameScreen)
             => SomethingOnScreen(gameScreen);
 
-        private int SomethingOnScreen(byte[] bitmap)
+        private ScreenAnalyseResult SomethingOnScreen(byte[] bitmap)
         {
             if (CheckForGameOverScreen(bitmap[(8 * 4)], bitmap[(8 * 4) + 1], bitmap[(8 * 4) + 2]))
-                return -1;
+                return new(-1, false);
 
-            //Dictionary<int, Pixel> mapping = new Dictionary<int, Pixel>();
+            return QuickAnalyser(bitmap);
+        }
+
+        private int CalculateXPosition(int sum)
+        {
+            while (sum >= 2560)
+                sum -= 2560;
+            return (int)sum;
+        }
+
+        /// <summary>
+        /// Bases decision on 1 pixel
+        /// </summary>
+        /// <param name="bitmap"></param>
+        /// <returns></returns>
+        private ScreenAnalyseResult QuickAnalyser(byte[] bitmap)
+        {
             Dictionary<Pixel, int> mapping = new Dictionary<Pixel, int>();
-            int sum = 0;
+
             for (int i = 3; i < bitmap.Length; i += 4)
             {
                 if (bitmap[i - 1] == referenceScreen[i - 1])
                     continue;
                 //Add the pixel that doesnt match the reference
-                //mapping.Add(i / 4, new(bitmap[i], bitmap[i - 3], bitmap[i - 2], bitmap[i - 1]));
-                if (mapping.TryAdd(new(bitmap[i], bitmap[i - 3], bitmap[i - 2], bitmap[i - 1]), i / 4));
+                if (mapping.TryAdd(new(bitmap[i], bitmap[i - 3], bitmap[i - 2], bitmap[i - 1]), i / 4)) ;
                 else
                 {
                     Pixel p = new(bitmap[i], bitmap[i - 3], bitmap[i - 2], bitmap[i - 1]);
@@ -50,22 +66,33 @@ namespace PlayGameAnalyser.Service
                 }
             }
             if (mapping.Count == 0)
-                return 0;
+                return new ScreenAnalyseResult(0, false);
+
+            //Caught
+            Pixel magnetic = new Pixel(255, 156, 74, 74);
+            int magneticLocation = mapping.FirstOrDefault(x => x.Key.Equals(magnetic)).Value;
+            if (magneticLocation > 0)
+                return new(-2, false);
+
+            //TODO Need pixel for the different colored balls
             //Ball
             Pixel ball = new(255, 66, 66, 66);
             //Powerup
             Pixel powerup = new(255, 206, 0, 0);
+            //Shoot
+            Pixel paddleGuns = new(255, 41, 123, 165);
 
-            sum = mapping.FirstOrDefault(x => x.Key.Equals(ball)).Value;
+            
+
+            int ballLocation = mapping.FirstOrDefault(x => x.Key.Equals(ball)).Value;
             int powerLocation = mapping.FirstOrDefault(x => x.Key.Equals(powerup)).Value;
+            int paddleGun = mapping.FirstOrDefault(x => x.Key.Equals(paddleGuns)).Value;
+            bool guns = paddleGun > 0;
 
-            if (powerLocation > sum)
-                sum = powerLocation;
-            //sum = mapping.FirstOrDefault(x => x.Key == match).Key;
+            if (powerLocation > ballLocation)
+                ballLocation = powerLocation;
 
-            while (sum >= 2560)
-                sum -= 2560;
-            return (int)sum;
+            return new(CalculateXPosition(ballLocation), guns);
         }
 
     }
